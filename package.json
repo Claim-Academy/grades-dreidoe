@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "db" : "json-server --watch db.json"
+    "db": "json-server --watch db.json"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
@@ -16,8 +16,6 @@
     "vitest": "^0.26.2"
   },
   "dependencies": {
-    "got": "^12.5.3",
-    "json": "^11.0.0",
-    "server": "^1.0.38"
+    "got": "^12.5.3"
   }
 }

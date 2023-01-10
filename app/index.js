@@ -1,1 +1,2 @@
-export const add2Nums = (num1, num2) => num1 + num2;
+import apiServices from "./api.services.js";
+const students = await apiServices.getStudents();
