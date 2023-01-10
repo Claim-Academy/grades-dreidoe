@@ -7,6 +7,12 @@ export default {
   },
 };
 export const getAllStudentNames = (students) =>
-  students.map((student) => student.name);
+  students.map((student) => student.grades.id.name);
 
-export const getStudentById = (movie, id);
+export function getStudentById(students, id) {
+  // find the movie
+  const studentWithIdNumber = students.find((student) => students._id === id);
+  if (!studentWithIdNumber) {
+    throw new Error("Movie Not Found");
+  }
+}
