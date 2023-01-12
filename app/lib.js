@@ -32,3 +32,22 @@ export const addGrade = ({ roster, gradeType, score, studentId }) => {
     grades: newStudentGrades,
   };
 };
+
+export const updateGrades = foundStudent.grades.map((grade) => {
+  if (grade.id === gradeId) {
+    return {
+      ...grade,
+      score: updatedScore,
+    };
+  }
+  return grade;
+});
+
+export const deleteGrade = ({ roster, gradeId, studentId }) => {
+  const foundStudent = getStudentById(roster, studentId);
+
+  const gradesWithoutDeletedGrade = foundStudent.grades.filter(
+  (grade) => grade.id !=== gradeId
+  );
+  foundStudent.grades = [...gradesWithoutDeletedGrade];
+}
