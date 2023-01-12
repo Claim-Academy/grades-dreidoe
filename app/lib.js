@@ -1,5 +1,4 @@
-import apiService from "./api.service.js";
-
+import apiServices from "./api.services.js";
 const grades = await apiService.getGrades();
 
 export const getAllNamesFromRoster = (roster) =>
@@ -10,5 +9,6 @@ export const getStudentById = (roster, id2Find) =>
 
 export const getStudentGradeById = (roster, gradeID, studentId) => {
   const foundStudent = getStudentById(roster, studentId);
-  return foundStudent.grades.find((grade) => grade.id === gradeID);
+  const foundGrade = foundStudent.grades.find((grade) => grade.id === gradeID);
+  return { ...foundGrade, name: foundStudent.name };
 };
