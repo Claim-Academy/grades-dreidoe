@@ -1,18 +1,13 @@
 import got from "got";
-const BASE_URL = "https://localhost:3000";
+const BASE_URL = "https://localhost:3001/grades";
 
 export default {
-  getStudents() {
-    return got(BASE_URL).json();
+  createStudent(payload) {
+    return got
+      .post(BASE_URL, {
+        json: payload,
+      })
+      .json();
   },
+  updateStudent(studentId, updateStudent) {},
 };
-export const getAllStudentNames = (students) =>
-  students.map((student) => student.grades.id.name);
-
-export function getStudentById(students, id) {
-  // find the movie
-  const studentWithIdNumber = students.find((student) => students._id === id);
-  if (!studentWithIdNumber) {
-    throw new Error("Movie Not Found");
-  }
-}

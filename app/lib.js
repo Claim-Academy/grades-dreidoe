@@ -47,7 +47,13 @@ export const deleteGrade = ({ roster, gradeId, studentId }) => {
   const foundStudent = getStudentById(roster, studentId);
 
   const gradesWithoutDeletedGrade = foundStudent.grades.filter(
-  (grade) => grade.id !=== gradeId
+  (grade) => grade.id ===! gradeId
   );
   foundStudent.grades = [...gradesWithoutDeletedGrade];
-}
+  if(studentId.id === studentId) {
+    return foundStudent;
+  });
+  return updatedRoster;
+};
+
+
