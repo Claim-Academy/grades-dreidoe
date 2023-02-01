@@ -21,6 +21,25 @@ const controller = {
     return Student.findById(id);
   },
 
+  async getAvgScoreByStudentId(id) {
+    const student = await this.getStudentById(id);
+
+    if (student) {
+      return student.avgPct;
+    }
+
+    throw new Error("Student not found");
+  },
+
+  async getCumulativeClassAvgScore() {
+    const students = await this.getStudents();
+
+    return (
+      students.reduce((avg, { avgPct }) => avg + avgPct, 0) / students.length
+    );
+  },
+
+  // `student` is expected to validate against the Student schema
   createStudent(student) {
     return Student.create(student);
   },
@@ -37,38 +56,57 @@ const controller = {
       // Trigger the save middleware (validate, etc.)
       return foundStudent.save();
     }
+
+    throw new Error("Student not found");
   },
 
-  // updatedName is an object with a name property from the request body
-  updateStudentNameById(id, updatedName) {
-    return Student.findByIdAndUpdate(
-      id,
-      { name: updatedName.name },
-      { rawResult: true }
+  updateStudentNameById(id, name) {
+    return Student.findByIdAndUpdate(id, { name }, { rawResult: true });
+  },
+
+  async updateStudentScoreByGradeName(studentId, updatedGrade) {
+    // Find the student by id
+    // 'this' refers to the controller object
+    const foundStudent = await this.getStudentById(studentId);
+
+    // If the student is found, update the grade
+    if (foundStudent) {
+      const grade2Update = foundStudent.grades.find(
+        (grade) => grade.name === updatedGrade.name
+      );
+
+      if (grade2Update) {
+        grade2Update.earned = updatedGrade.earned;
+
+        // Trigger the save middleware (validate, etc.)
+        return foundStudent.save();
+      }
+
+      throw new Error("Grade not found. Did you enter the correct name?");
+    } else {
+      throw new Error("Student not found");
+    }
+  },
+
+  updateGradeName(originalGradeName, updatedGradeName) {
+    return Student.updateMany(
+      { "grades.name": originalGradeName },
+      { $set: { "grades.$.name": updatedGradeName } },
+      { multi: true }
     );
   },
 
-  // TODO: Add method to update a single score by student id and score id
+  updateGradeWithCurve(originalGradeName, curve) {
+    return Student.updateMany(
+      { "grades.name": originalGradeName },
+      { $inc: { "grades.$.earned": curve } },
+      { multi: true }
+    );
+  },
 
-  // TODO: Add method to delete a single score by student id and score id
-
-  // TODO: Add method to delete a single student by id
+  deleteStudentById(id) {
+    return Student.findByIdAndDelete(id);
+  },
 };
 
-const updatedStudent = await controller
-  .createGradeForStudentById("63d81d16a92c37c6ea49b75b", {
-    gradeType: "quiz",
-    name: "Test Quiz",
-    earned: 100,
-    possible: 100,
-  })
-  .catch((err) => {
-    if (err.name === "ValidationError") {
-      console.error(err.message);
-    }
-
-    // console.error(err);
-  });
-
-console.log(updatedStudent);
 export default controller;
