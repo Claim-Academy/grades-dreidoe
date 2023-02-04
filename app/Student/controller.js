@@ -1,4 +1,4 @@
-import Student from "./Student.js";
+iimport Student from "./Student.js";
 
 const controller = {
   getStudents() {
@@ -21,10 +21,14 @@ const controller = {
 
   async getCumulativeClassAvgScore() {
     const students = await this.getStudents();
+    const numOfStudentsWithGrades = students.filter(
+      (student) => student.grades.length
+    ).length;
 
     return (
-      students.reduce((avg, { avgPct }) => avg + avgPct, 0) / students.length
-    );
+      students.reduce((avg, { avgPct }) => avg + avgPct, 0) /
+      numOfStudentsWithGrades
+    ).toFixed(1);
   },
 
   // `student` is expected to validate against the Student schema
@@ -32,7 +36,7 @@ const controller = {
     return Student.create(student);
   },
 
-  async createGradeForStudentById(id, grade) {
+  async updateStudentWithGrade(id, grade) {
     // Find the student by id
     // 'this' refers to the controller object
     const foundStudent = await this.getStudentById(id);
@@ -49,7 +53,20 @@ const controller = {
   },
 
   updateStudentNameById(id, name) {
-    return Student.findByIdAndUpdate(id, { name }, { rawResult: true });
+    return Student.findByIdAndUpdate(
+      id,
+      { name },
+      {
+        // Return the updated document
+        new: true,
+
+        rawResult: true,
+
+        // NS 😕 if BOTH are needed to ALWAYS VALIDATE!
+        runValidators: true,
+        strict: "throw",
+      }
+    );
   },
 
   async updateStudentScoreByGradeName(studentId, updatedGrade) {
@@ -76,12 +93,17 @@ const controller = {
     }
   },
 
-  updateGradeName(originalGradeName, updatedGradeName) {
-    return Student.updateMany(
-      { "grades.name": originalGradeName },
-      { $set: { "grades.$.name": updatedGradeName } },
-      { multi: true }
-    );
+  updateGradeName(originalGradeName, newGradeName) {
+    if (originalGradeName && newGradeName) {
+      return Student.updateMany(
+        { "grades.name": originalGradeName },
+        { $set: { "grades.$.name": newGradeName } },
+        { multi: true }
+      );
+    }
+
+    // * Must return a Promise as this is not marked as async
+    return Promise.reject(new Error("Invalid grade name(s)"));
   },
 
   updateGradeWithCurve(originalGradeName, curve) {
